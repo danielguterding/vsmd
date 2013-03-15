@@ -2,7 +2,9 @@
 
 vsmd is a free and very simple molecular dynamics code. It simulates the most
 simple case in which a classical potential can be used to model actual bulk
-materials: the Lennard-Jones potential for noble gas crystals and liquids. 
+materials: the Lennard-Jones potential for noble gas crystals and liquids.
+
+Calculations can be carried out at finite temperature and pressure.
 
 The potential is taken into account up to a cutoff radius. To avoid jumps in 
 the energy for particles crossing the cutoff distance the potential is shifted
@@ -25,7 +27,16 @@ shapes and anisotropic pressures are not a problem if you implement an
 integrator that can handle them. Periodic boundaries will be maintained for any
 shape unless the minimum image criterion is violated.
 
-Implementing new integrator-thermostat-barostat combinations should be easy.
+For an introduction to the molecular dynamics method please have a look at:
+  
+  Ercolessi, F.: A molecular dynamics primer. Spring College in Computational
+                 Physics, ICTP, Trieste, 1997
+                 
+For the Berendsen temperature and pressure coupling method please see:
+
+  Berendsen, H. J. C. et al.: Molecular dynamics with coupling to an external
+                              bath. In: J. Chem. Phys. 81 (1984), No. 8, 
+                              p. 3684–3690
 
 If you have any questions about this code or encounter bugs, please contact the
 author.
