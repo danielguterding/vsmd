@@ -1,0 +1,41 @@
+\documentclass[a4paper,11pt]{scrartcl}
+\usepackage[english]{babel}
+\usepackage{amssymb,amsmath}
+\usepackage[utf8x]{inputenc}
+
+\begin{document}
+\title{Lennard-Jones Reduced Units}
+\date{}
+\maketitle
+
+\section*{Why use reduced units ?}
+Reduced units divide all physical quantities by characteristic scales of the simulated system. Thus all simulated quantities will take values around unity in reduced units. This avoids numerical errors due to very small or large numbers and makes coding errors that result in unphysical behaviour easier to spot.
+
+\section*{Example}
+As an example we take the Lennard-Jones 12-6-Potential and transform all quantities to their starred reduced analogs. The characteristic scale of the energy is the depth of the potential $\varepsilon$. The characteristic scale of the length is the root $\sigma$. The Potential $\phi$ is an energy, so $\phi^* = \phi / \varepsilon $. The pair distance $r$ is a length, so $r^* = r / \sigma $
+\begin{displaymath}
+\phi (r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} - \left( \frac{\sigma}{r} \right)^6 \right] \quad \rightarrow \quad \phi^* (r^*) = 4 \left[ (r^*)^{-12} - (r^*)^{-6} \right]
+\end{displaymath}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lrr}
+quantity & symbol & definition \\
+\hline
+length & $r^*$ & $r / \sigma$  \\
+energy & $E^*$ & $E / \varepsilon$ \\
+mass & $m^*$ & 1\\
+time & $t^*$ & $t / \left( \sigma \sqrt{m / \varepsilon} \right)$ \\
+temperature & $T^*$ & $k_B T / \varepsilon$ \\
+number density & $\rho^*$ & $\rho \sigma^3$ \\
+velocity & $v^*$ & $v / \sqrt{\varepsilon / m}$  \\
+force & $F^*$ & $F \sigma / \varepsilon$ \\
+pressure & $p^*$ & $p \sigma^3 / \varepsilon$ \\
+\end{tabular}
+\caption{Conversion table for Lennard-Jones reduced units. Starred letters are associated with reduced units.}
+\end{table}
+
+\section*{Parameter sets}
+The results obtained in reduced units can be interpreted in a physically meaningful way through the use of parameters $\varepsilon$ and $\sigma$ that reflect properties of real systems. For the most well know set, the so called \textit{Bernardes parameters}, see  Bernardes, N.: Phys. Rev. 112 (1958), p. 1534–1539.
+
+\end{document}

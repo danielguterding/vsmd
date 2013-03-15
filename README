@@ -1,0 +1,177 @@
+#vsmd
+
+vsmd is a free and very simple molecular dynamics code. It simulates the most
+simple case in which a classical potential can be used to model actual bulk
+materials: the Lennard-Jones potential for noble gas crystals and liquids. 
+
+The potential is taken into account up to a cutoff radius. To avoid jumps in 
+the energy for particles crossing the cutoff distance the potential is shifted
+to zero at the cutoff. As an alternative to the Lennard-Jones Potential the
+exponential Buckingham potential can be used.
+
+The determination of interacting pairs is done in a simple double loop for
+every time step.
+
+Periodic boundary conditions with a minimum image criterion are used in all
+spatial directions to reduce finite size effects.
+
+All calculations are performed in dimensionless quantities. The rules after
+which these reduced units are constructed can be found in the subdirectory 
+units.
+
+Currently only hydrostatic pressure coupling is implemented, because the 
+Berendsen integrator cannot handle changing box shapes. However triclinic box
+shapes and anisotropic pressures are not a problem if you implement an 
+integrator that can handle them. Periodic boundaries will be maintained for any
+shape unless the minimum image criterion is violated.
+
+Implementing new integrator-thermostat-barostat combinations should be easy.
+
+If you have any questions about this code or encounter bugs, please contact the
+author.
+
+##0. Building
+
+This chapter assumes that you are working in a standard Linux environment with
+tools like g++, make and git already installed. Other operating systems should
+not be a problem if you are able to modify the build scripts and provide the
+required dependencies.
+
+required:
+* [Eigen >=3.05](http://eigen.tuxfamily.org/)
+* [Boost >=1.48](http://www.boost.org/)
+
+After having installed the required dependencies the source code can be
+obtained and compiled with the following commands:
+
+  git clone git://github.com/danielguterding/vsmd.git
+  cd vsmc
+  make
+  
+You should now have an executable named vsmd in the vsmd folder.
+
+##1. Scripting
+
+An example script that shows how to extract physical quantities from 
+simulations is given by epp.py. It calculates the energy per particle for a
+series of temperatures at fixed finite pressure. A structural phase transition
+is associated with a jump in the energy per particle. This jump is the so
+called melting heat. To execute the script type:
+
+  python epp.py
+  
+You should now find some data files and a plot in the data subfolder, which is 
+automatically created by the script.
+
+required:
+
+* [Python 2.7](http://www.python.org/)
+* [Numpy >=1.6.1](http://www.numpy.org/)
+* [pyxplot >=0.8.4](http://pyxplot.org.uk/)
+
+Note: If you do not prefer Python as a scripting language, you can construct
+      your own scripts in your programming language of choice, of course.
+Note: Under Ubuntu 12.04 numpy 1.6.1 sets the cpu affinity of all python
+      subprocesses to one specific cpu core. To circumvent this 
+      taskset -p 0xff <pid> is used, which might not be necessary for you or
+      even problematic if numpy does that for a good reason.
+
+##2. Command line arguments
+
+vsmd [uint processid]
+     [uint mode]
+     [uint potential]
+     [uint gridsize]
+     [uint nsteps]
+     [float boxlength]
+     [float rcutoff]
+     [float deltat]
+     [float t_thermo]
+     [float t_baro]
+     [float T_des]
+     [float P_des]
+     
+ uint processid
+In case multiple instances of vsmd are started with the same parameters for the
+purpose of statistical evaluation, different process ids are used to seed the 
+random number generators. Starting multiple instances of vsmd with identical
+process id and settings at the same time will result in identical results.
+
+ uint mode
+Sets the integration algorithm and ensemble to be used.
+== 1: Use Velocity-Verlet integrator in NVE ensemble.
+== 2: Use Velocity-Verlet integrator with simple rescaling thermostat in NVT
+      ensemble.
+== 3: Use Leapfrog integrator with Berendsen Thermostat in NVT ensemble.
+== 4: Use Leapfrog integrator with Berendsen Thermostat and Barostat in NPT
+      ensemble.
+== 5: Mode 4 with output of averaged energy per particle.
+Note: Except for mode 5 no file ouptut is generated. Mode 5 can be seen as an
+      example of how to extract physical quantities from the simulation. Modes
+      1 to 4 only demonstrate how a molecular dynamic loop can be constructed 
+      and aid the programmer in determining the performance of a certain system
+      size.
+
+ uint potential
+Sets pair potential to be used.
+== 1: Use Lennard-Jones 12-6 (inverse polynomial) potential.
+== 2: Use Buckingham (exponential) potential.
+
+ uint gridsize
+Set the number of conventional fcc lattice cells to be used in every spatial 
+direction. A gridsize of 6 will result in a simulation volume containing 6*6*6
+conventional fcc lattice cell, i.e. 4*6*6*6=864 atoms.
+
+ uint nsteps
+Sets the total number of timesteps to perform before the simulation is stopped.
+
+ float boxlength
+Sets the reduced length of the cubic simulation volume. A boxlength of 20
+results in a volume V=20*20*20.
+Note: The boxlength must always exceed 2*rcutoff to fulfill the minimum image
+      criterion. For the pressure controlled runs this has to be checked 
+      manually. 
+      A cutoff radius of 2.1 allows a maximum pressure of 35 for a
+      gridsize of 6 in order to maintain the minimum image criterion.
+
+ float rcutoff
+Sets the reduced potential cutoff radius beyond which atomic interactions are
+neglected.
+
+ float deltat
+Sets the reduced width of the integration time steps. The smaller the values 
+set, the more cpu time will be needed for physical quantities to relax. Large
+values will result in large numerical errors in the integration algorithms.
+
+ float t_thermo
+Sets the thermostat rise time in units of the time step width deltat. A 
+t_thermo of 10 will effectively result in a thermostat rise time of 10*deltat.
+Rise times smaller than unity will always result in unphysical behaviour.
+
+ float t_baro
+Sets the barostat rise time in units of the time step width deltat. A 
+t_baro of 150 will effectively result in a barostat rise time of 150*deltat.
+Rise times smaller than unity will always result in unphysical behaviour.
+
+ float T_des
+Sets the desired reduced system temperature.
+
+ float P_des
+Sets the desired reduced hydrostatic system pressure.
+
+##License
+
+Copyright (c) 2013, Daniel Guterding <guterding@itp.uni-frankfurt.de>
+
+vsmd is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+vsmd is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with vsmd. If not, see <http://www.gnu.org/licenses/>.
