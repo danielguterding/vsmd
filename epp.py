@@ -95,7 +95,7 @@ def plot_results(Pressure, data_path, datfile_path):
 def epp():
   nruns = 5 #number of runs per p-T-point
   Pressure = 5.0
-  Temperature_list = list(np.arange(1.055, 1.07, 0.005))
+  Temperature_list = list(np.arange(1.055, 1.20, 0.005))
   
   data_path = 'data/';
   logfile_path = 'data/log.txt'
