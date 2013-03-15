@@ -18,6 +18,7 @@
 #
 
 import os
+import shutil
 import subprocess
 import numpy as np
 
@@ -33,10 +34,10 @@ def call_vsmd(processid, T_des, P_des):
   deltat = 3E-3
   t_thermo = 10
   t_baro = 150
-    
-  p = subprocess.Popen(['./vsmd', str(processid), str(mode), str(potential), str(gridsize), str(nsteps),
-                                  str(boxlength), str(rcutoff), str(deltat), str(t_thermo), str(t_baro), 
-                                  str(T_des), str(P_des)])       
+  
+  command = './vsmd %i %i %i %i %i %f %f %f %f %f %f %f' % (processid, mode, potential, gridsize, nsteps, boxlength, rcutoff, deltat,
+                                                           t_thermo, t_baro, T_des, P_des)
+  p = subprocess.Popen(command.split())       
   return p
   
 def call_procs(nruns, T_des, P_des):
@@ -87,12 +88,14 @@ def plot_results(Pressure, data_path, datfile_path):
   pyxfile.write(script)
   pyxfile.close()
   
-  subprocess.Popen('pyxplot', pyxfile_path)
+  command = 'pyxplot %s' % pyxfile_path
+  p = subprocess.Popen(command.split())
+  p.wait()
   
 def epp():
   nruns = 5 #number of runs per p-T-point
   Pressure = 5.0
-  Temperature_list = list(np.arange(1.055, 1.2, 0.005))
+  Temperature_list = list(np.arange(1.055, 1.07, 0.005))
   
   data_path = 'data/';
   logfile_path = 'data/log.txt'
@@ -100,6 +103,10 @@ def epp():
   
   if (not os.path.exists(data_path)):
     os.mkdir(data_path)
+    
+  for path in [logfile_path, datfile_path]:
+    if (os.path.isfile(path)):
+      shutil.copyfile(path, path + '.bak')
   
   outfile = open(datfile_path, 'w')
   outfile.write('# Temperature, Pressure, Energy per Particle\n')
